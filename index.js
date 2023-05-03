@@ -30,16 +30,62 @@ app.get('/mahasiswa/:nim', (req, res) => {
     })
 })
 
-app.post('/mahasiswa/post', (req, res) => {
-    response(200, "posting", res)
+app.post('/mahasiswa', (req, res) => {
+    const {nim, nama, kelas, alamat} = req.body
+
+    // console.log(req.body)
+    const sql = `INSERT INTO mahasiswa (nim,nama,kelas,alamat) VALUES (${nim}, '${nama}', '${kelas}', '${alamat}')`
+
+    db.query(sql, (err, fields) => {
+        if (err) response(500, "invalid", "error", res)
+
+        if(fields?.affectedRows){
+            const data  = {
+                isSuccess : fields.affectedRows,
+                id: fields.insertId
+            }
+            response(200, data, "data Add Succesfully", res)
+        }
+    })
 })
 
-app.put('/mahasiswa/put', (req, res) => {
-    response(200, "update", res)
+app.put('/mahasiswa', (req, res) => {
+    const {nim, nama, kelas, alamat} = req.body
+
+    // console.log(req.body)
+    const sql = `UPDATE mahasiswa SET  nama = '${nama}', kelas = '${kelas}', alamat = '${alamat}' WHERE nim = ${nim}`
+
+    db.query(sql, (err, fields) => {
+        if (err) response(500, "invalid", "error", res)
+
+        if(fields?.affectedRows){
+            const data  = {
+                isSuccess : fields.affectedRows,
+                message: fields.message,
+            }
+            response(200, data, "Update data Succesfully", res)
+        } else {
+            response(400, "user not found", "error", res)
+        }
+    })
 })
 
-app.delete('/mahasiswa/delete', (req, res) => {
-    response(200, "hapus", res)
+app.delete('/mahasiswa', (req, res) => {
+    const {nim} = req.body
+    const sql = `DELETE FROM mahasiswa WHERE nim = ${nim}`
+
+    db.query(sql, (err, fields) => {
+        if (err) response(500, "invalid", "error", res)
+
+        if(fields?.affectedRows){
+            const data  = {
+                isSuccess : fields.affectedRows,
+            }
+            response(200, data, "Delete data Succesfully", res)
+        } else {
+            response(400, "user not found", "error", res)
+        }
+    })
 })
 
 app.listen(port, () => {
